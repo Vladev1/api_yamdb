@@ -1,38 +1,8 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from users.models import CustomUser
 
 from reviews.validators import validate_year
 from reviews.validators import validate_score
-
-
-class User(AbstractUser):
-    USERS_ROLE = (
-        ("user", "user"),
-        ("moderator", "moderator"),
-        ("admin", "admin"),
-    )
-
-    username = models.CharField(max_length=150, unique=True)
-    first_name = models.CharField(max_length=150, blank=True, null=True)
-    last_name = models.CharField(max_length=150, blank=True, null=True)
-    email = models.EmailField(max_length=254, unique=True)
-    bio = models.CharField(max_length=400, blank=True, null=True)
-    role = models.CharField(max_length=10, choices=USERS_ROLE, default="user")
-
-    @property
-    def is_admin(self):
-        if self.role == "admin" or self.is_superuser:
-            return True
-        return False
-
-    @property
-    def is_moderator(self):
-        if self.role == "moderator":
-            return True
-        return False
-
-    class Meta:
-        ordering = ["date_joined"]
 
 
 class Category(models.Model):
