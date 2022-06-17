@@ -13,6 +13,9 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.pagination import PageNumberPagination
 from django.core.exceptions import ValidationError
 from django.conf import settings
+from django.views.generic import CreateView 
+from django.urls import reverse_lazy 
+from .forms import CreationForm 
 
 from .mixins import CategoryGenreModelMixin, TitleModelMixin
 from .filters import TitleFilter
@@ -43,7 +46,6 @@ from django.db.models import Avg
 def send_confirmation_code(request):
     """Отправка письма с кодом подтверждения на почту."""
     email = request.data.get('email')
-    email_validator(email)
     email_split = email.split('@')
     username = email_split[0]
     user, created = User.objects.get_or_create(
@@ -238,3 +240,8 @@ class UserViewSet(viewsets.ModelViewSet):
                 serializer.data,
                 status=status.HTTP_200_OK
             )
+            
+
+class SignUp(CreateView): 
+    form_class = CreationForm 
+    success_url = 'api:send_confirmation_code'

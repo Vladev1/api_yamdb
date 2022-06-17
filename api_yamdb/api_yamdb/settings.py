@@ -15,17 +15,17 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
     'django.contrib.auth',
+    'django.contrib.admin',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'django_filters',
     'djoser',
+    'django_filters',
     'users',
-    'api',
+    'api.apps.ApiConfig',
     'yamdb',
 ]
 
@@ -124,4 +124,7 @@ REST_FRAMEWORK = {
 
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
-CONTACT_EMAIL = 'admin@api_yamdb.com'
+CONTACT_EMAIL = 'admin@yamdb.com'
+SIMPLE_JWT = {
+   'AUTH_HEADER_TYPES': ('Bearer',),
+} 

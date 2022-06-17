@@ -10,8 +10,10 @@ from .views import (
     ReviewViewSet,
     CommentViewSet,
     get_token,
-    UserViewSet
+    UserViewSet,
+    SignUp,
 )
+app_name = 'api' 
 
 router = routers.DefaultRouter()
 router.register('categories', CategoryViewSet)
@@ -31,11 +33,15 @@ router.register('users', UserViewSet, basename='User')
 
 urlpatterns = [
     path('v1/', include(router.urls)),
+    path('v1/auth/signup/', SignUp.as_view(), name='signup'),
     path(
         'v1/auth/email/',
         send_confirmation_code,
         name='send_confirmation_code'
     ),
+    path('v1/', include('djoser.urls')), 
+
+    path('v1/', include('djoser.urls.jwt')), 
     path(
         'v1/auth/token/',
         get_token,
