@@ -141,6 +141,7 @@ class UserSerializerOrReadOnly(serializers.ModelSerializer):
         )
         model = User
 
+
 class UserSignupSerializer(serializers.ModelSerializer):
     """ Сериализация регистрации пользователя и создания нового. """
     class Meta:

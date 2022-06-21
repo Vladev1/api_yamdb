@@ -6,7 +6,7 @@ from .views import (CategoryViewSet, CommentViewSet, GenreViewSet,
                     ReviewViewSet, TitleViewSet, UserSignupViewset,
                     UserViewSet, get_token, send_confirmation_code)
 
-app_name = 'api' 
+app_name = 'api'
 
 router = routers.DefaultRouter()
 router.register('categories', CategoryViewSet)
