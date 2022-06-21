@@ -22,11 +22,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'djoser',
+    'rest_framework_simplejwt',
     'django_filters',
     'users',
     'api.apps.ApiConfig',
-    'yamdb',
+    'reviews',
 ]
 
 MIDDLEWARE = [
@@ -125,6 +125,4 @@ REST_FRAMEWORK = {
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
 CONTACT_EMAIL = 'admin@yamdb.com'
-SIMPLE_JWT = {
-   'AUTH_HEADER_TYPES': ('Bearer',),
-} 
+SIMPLE_JWT = {'AUTH_HEADER_TYPES': ('Bearer',)}

@@ -1,54 +1,39 @@
-from rest_framework.permissions import (
-    IsAuthenticatedOrReadOnly,
-    IsAuthenticated
-)
-from rest_framework.decorators import api_view, action
-from django_filters import rest_framework as django_filters
-from rest_framework.response import Response
-from django.core.mail import send_mail
-from django.contrib.auth.tokens import default_token_generator
-from rest_framework import viewsets, status, filters
-from django.shortcuts import get_object_or_404
-from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.pagination import PageNumberPagination
-from django.core.exceptions import ValidationError
 from django.conf import settings
-from django.views.generic import CreateView 
-from django.urls import reverse_lazy 
-from .forms import CreationForm 
-
-from .mixins import CategoryGenreModelMixin, TitleModelMixin
-from .filters import TitleFilter
-from yamdb.models import Review, User, Category, Title, Genre
-from .permissions import (
-    AuthorAdminModeratorObjectPermission,
-    AdminPermissionOrReadOnlyPermission,
-    AdminOnlyPermission,
-)
-from .mixins import CategoryGenreModelMixin, TitleModelMixin
-from .filters import TitleFilter
-from .serializers import (
-    CommentSerializer,
-    ReviewSerializer,
-    CategorySerializer,
-    TitleSerializer,
-    TitleCreateSerializer,
-    GenreSerializer,
-    UserSerializer,
-    UserSerializerOrReadOnly
-)
-from .validators import email_validator
-
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail
 from django.db.models import Avg
+from django.shortcuts import get_object_or_404
+from django_filters import rest_framework as django_filters
+from rest_framework import filters, status, views, viewsets
+from rest_framework.decorators import action, api_view
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import (AllowAny, IsAuthenticated,
+                                        IsAuthenticatedOrReadOnly)
+from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import RefreshToken
+from reviews.models import Category, Genre, Review, Title, User
+
+from .filters import TitleFilter
+from .mixins import CategoryGenreModelMixin, TitleModelMixin
+from .permissions import (AdminOnlyPermission,
+                          AdminPermissionOrReadOnlyPermission,
+                          AuthorAdminModeratorObjectPermission)
+from .serializers import (CategorySerializer, CommentSerializer,
+                          GenreSerializer, ReviewSerializer,
+                          TitleCreateSerializer, TitleSerializer,
+                          UserSerializer, UserSerializerOrReadOnly,
+                          UserSignupSerializer)
+from .validators import email_validator
 
 
 @api_view(['POST'])
 def send_confirmation_code(request):
     """Отправка письма с кодом подтверждения на почту."""
     email = request.data.get('email')
+    email_validator(email)
     email_split = email.split('@')
     username = email_split[0]
-    user, created = User.objects.get_or_create(
+    user = User.objects.get_or_create(
         is_active=False,
         email=email,
         username=username,
@@ -69,20 +54,49 @@ def send_confirmation_code(request):
     return Response({'email': email})
 
 
+class UserSignupViewset(views.APIView):
+    """Регистрация нового пользователя, получение кода."""
+    permission_classes = (AllowAny,)
+
+    def tokensend(self, user, username, email):
+        token = default_token_generator.make_token(user)
+        send_mail('confirmation_code',
+                  token,
+                  'admin@yamdb.ru',
+                  [email])
+
+    def post(self, request):
+        try:
+            username = request.data['username']
+            email = request.data['email']
+            user = User.objects.get(username=username, email=email)
+            self.tokensend(user, username, email)
+        except (KeyError, User.DoesNotExist):
+            serializer = UserSignupSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            username = request.data['username']
+            email = request.data['email']
+            if username == 'me':
+                return Response(
+                    {'Использовать имя "me" в качестве username запрещено.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            user = serializer.save()
+            self.tokensend(user, username, email)
+        return Response(
+            {'username': username, 'email': email},
+            status=status.HTTP_200_OK
+        )
+
+
 @api_view(['POST'])
 def get_token(request):
     """Получение токена."""
-    email = request.data.get('email')
-    email_validator(email)
+    username = request.data.get('username')
     confirmation_code = request.data.get('confirmation_code')
-    if not confirmation_code or not email:
-        raise ValidationError(
-            {
-                'info': 'confirmation_code и email '
-                        'являются обязательными полями!'
-            }
-        )
-    user = get_object_or_404(User, email=email)
+    if not confirmation_code or not username:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    user = get_object_or_404(User, username=username)
     result = {'info': 'Введите правильный confirmation_code'}
     if default_token_generator.check_token(
             user=user,
@@ -100,7 +114,7 @@ def get_token(request):
             }
 
         result = get_tokens_for_user(user)
-    return Response(result)
+    return Response(result, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -209,7 +223,6 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = (AdminOnlyPermission,)
     pagination_class = PageNumberPagination
     filter_backends = [filters.SearchFilter]
-    search_fields = ['user__username', ]
 
     @action(
         detail=False,
@@ -240,8 +253,3 @@ class UserViewSet(viewsets.ModelViewSet):
                 serializer.data,
                 status=status.HTTP_200_OK
             )
-            
-
-class SignUp(CreateView): 
-    form_class = CreationForm 
-    success_url = 'api:send_confirmation_code'

@@ -1,6 +1,5 @@
 from django_filters import rest_framework as django_filters
-
-from yamdb.models import Title
+from reviews.models import Title
 
 
 class TitleFilter(django_filters.FilterSet):
@@ -28,5 +27,5 @@ class TitleFilter(django_filters.FilterSet):
             'name',
             'year',
             'category',
-            'genre'
+            'genre',
         )
