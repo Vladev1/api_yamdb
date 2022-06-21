@@ -1,8 +1,7 @@
 from django.db import models
 from users.models import CustomUser
-
+from django.core.validators import MaxValueValidator, MinValueValidator
 from reviews.validators import validate_year
-from reviews.validators import validate_score
 
 
 class Category(models.Model):
@@ -81,14 +80,6 @@ class Title(models.Model):
         blank=True,
     )
 
-    rating = models.PositiveSmallIntegerField(
-        verbose_name='Рейтинг',
-        help_text='Рейтинг произведения',
-        null=True,
-        validators=(validate_score,),
-        blank=True,
-    )
-
     class Meta:
         verbose_name = 'Произведение'
         verbose_name_plural = 'Произведения'
@@ -106,15 +97,17 @@ class Review(models.Model):
         related_name='review',
         verbose_name='Произведение'
     )
-    score = models.PositiveSmallIntegerField(
-        help_text='Новая оценка',
+    score = models.IntegerField(
+        validators=[
+            MaxValueValidator(10, 'Максимальная оценка - 10'),
+            MinValueValidator(1, 'Минимальная оценка - 1')
+        ],
         verbose_name='Оценка произведения',
-        validators=(validate_score,),
     )
     author = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='review'
+        CustomUser, on_delete=models.CASCADE,
+        related_name='reviews',
+        verbose_name='Автор'
     )
     text = models.TextField(
         help_text='Текст нового отзывы',
@@ -146,7 +139,7 @@ class Comment(models.Model):
         verbose_name='Произведение'
     )
     author = models.ForeignKey(
-        User,
+        CustomUser,
         on_delete=models.CASCADE,
         related_name='comments',
         verbose_name='Автор',
