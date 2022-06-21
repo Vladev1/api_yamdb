@@ -1,19 +1,12 @@
-from django.urls import path, include
+from django.urls import include, path
 from rest_framework import routers
 from rest_framework_simplejwt.views import TokenRefreshView
 
-from .views import (
-    send_confirmation_code,
-    CategoryViewSet,
-    TitleViewSet,
-    GenreViewSet,
-    ReviewViewSet,
-    CommentViewSet,
-    get_token,
-    UserViewSet,
-    SignUp,
-)
-app_name = 'api' 
+from .views import (CategoryViewSet, CommentViewSet, GenreViewSet,
+                    ReviewViewSet, TitleViewSet, UserSignupViewset,
+                    UserViewSet, get_token, send_confirmation_code)
+
+app_name = 'api'
 
 router = routers.DefaultRouter()
 router.register('categories', CategoryViewSet)
@@ -32,23 +25,20 @@ router.register(
 router.register('users', UserViewSet, basename='User')
 
 urlpatterns = [
-    path('v1/', include(router.urls)),
-    path('v1/auth/signup/', SignUp.as_view(), name='signup'),
+    path('', include(router.urls)),
     path(
-        'v1/auth/email/',
+        'auth/email/',
         send_confirmation_code,
         name='send_confirmation_code'
     ),
-    path('v1/', include('djoser.urls')), 
-
-    path('v1/', include('djoser.urls.jwt')), 
+    path('auth/signup/', UserSignupViewset.as_view(), name='signup'),
     path(
-        'v1/auth/token/',
+        'auth/token/',
         get_token,
         name='token_obtain_pair'
     ),
     path(
-        'v1/auth/token/refresh/',
+        'auth/token/refresh/',
         TokenRefreshView.as_view(),
         name='token_refresh'
     ),

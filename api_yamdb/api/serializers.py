@@ -1,7 +1,5 @@
 from rest_framework import serializers
-
-
-from yamdb.models import Category, Title, Genre, Comment, Review, User
+from reviews.models import Category, Comment, Genre, Review, Title, User
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -142,3 +140,10 @@ class UserSerializerOrReadOnly(serializers.ModelSerializer):
             'role'
         )
         model = User
+
+
+class UserSignupSerializer(serializers.ModelSerializer):
+    """ Сериализация регистрации пользователя и создания нового. """
+    class Meta:
+        model = User
+        fields = ['email', 'username']
