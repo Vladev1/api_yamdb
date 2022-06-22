@@ -21,11 +21,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+<<<<<<< HEAD
     'rest_framework',
     'rest_framework_simplejwt',
     'django_filters',
     'users',
     'api.apps.ApiConfig',
+=======
+>>>>>>> origin/developreviews
     'reviews',
 ]
 
