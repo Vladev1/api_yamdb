@@ -20,15 +20,12 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
-<<<<<<< HEAD
+    'django.contrib.staticfiles'
     'rest_framework',
     'rest_framework_simplejwt',
     'django_filters',
     'users',
     'api.apps.ApiConfig',
-=======
->>>>>>> origin/developreviews
     'reviews',
 ]
 
