@@ -6,7 +6,6 @@ from users.models import CustomUser
 from django.core.validators import MaxValueValidator, MinValueValidator
 from reviews.validators import validate_year
 
-<<<<<<< HEAD
 User = get_user_model()
 
 
@@ -26,8 +25,7 @@ class Category(models.Model):
     class Meta:
         ordering = ['id', ]
         verbose_name_plural = 'Категории'
-        verbose_name = 'Категория'
-=======
+
 
 class Category(models.Model):
     name = models.CharField(
@@ -39,12 +37,10 @@ class Category(models.Model):
     slug = models.SlugField(
         unique=True
     )
->>>>>>> origin/developreviews
 
     def __str__(self):
         return self.name
 
-<<<<<<< HEAD
 
 class Genre(models.Model):
     """Модель жанров"""
@@ -63,7 +59,7 @@ class Genre(models.Model):
         ordering = ['id', ]
         verbose_name_plural = 'Жанры'
         verbose_name = 'Жанр'
-=======
+
     class Meta:
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
@@ -88,12 +84,10 @@ class Genre(models.Model):
         verbose_name = 'Жанр'
         verbose_name_plural = 'Жанры'
         ordering = ('name',)
->>>>>>> origin/developreviews
 
 
 class Title(models.Model):
     name = models.CharField(
-<<<<<<< HEAD
         verbose_name='Произведение',
         max_length=100
     )
@@ -121,7 +115,6 @@ class Title(models.Model):
         ordering = ['id', ]
         verbose_name_plural = 'Произведения'
         verbose_name = 'Произведение'
-=======
         verbose_name='Наименование',
         help_text='Наименование произведения',
         max_length=500
@@ -160,13 +153,11 @@ class Title(models.Model):
         verbose_name = 'Произведение'
         verbose_name_plural = 'Произведения'
         ordering = ('name',)
->>>>>>> origin/developreviews
 
     def __str__(self):
         return self.name
 
 
-<<<<<<< HEAD
 class TitleGenre(models.Model):
     """Модель жанров произведений"""
 
@@ -208,7 +199,7 @@ class Review(models.Model):
 
     class Meta:
         ordering = ['pub_date', ]
-=======
+
 class Review(models.Model):
     title = models.ForeignKey(
         Title,
@@ -239,7 +230,6 @@ class Review(models.Model):
 
     class Meta:
         ordering = ('score',)
->>>>>>> origin/developreviews
         constraints = (
             models.UniqueConstraint(
                 fields=('title', 'author'),
@@ -248,7 +238,6 @@ class Review(models.Model):
         )
 
     def __str__(self):
-<<<<<<< HEAD
         return self.text
 
 
@@ -271,7 +260,7 @@ class Comment(models.Model):
         on_delete=models.CASCADE,
         related_name='comments'
     )
-=======
+
         return self.text[:15]
 
 
@@ -306,4 +295,3 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.text[:15]
->>>>>>> origin/developreviews
